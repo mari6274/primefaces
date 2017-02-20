@@ -1009,9 +1009,8 @@ PrimeFaces.widget.SelectOneMenu = PrimeFaces.widget.DeferredWidget.extend({
     handleEnterKey: function(event) {
         if(this.panel.is(':visible')) {
             this.selectItem(this.getActiveItem());
+            event.preventDefault();
         }
-        
-        event.preventDefault();
     },
     
     handleSpaceKey: function(event) {
