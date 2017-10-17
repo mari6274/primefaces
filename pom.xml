@@ -9,7 +9,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.primefaces</groupId>
-    <artifactId>primefaces</artifactId>
+    <artifactId>primefaces-aasys</artifactId>
     <packaging>jar</packaging>
     <version>6.1</version>
     <name>primefaces</name>
