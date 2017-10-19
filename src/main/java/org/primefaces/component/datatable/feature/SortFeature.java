@@ -99,7 +99,11 @@ public class SortFeature implements DataTableFeature {
 		table.setFirst(0);
         
         if(table.isLazy()) {
-            table.loadLazyData();
+            if(table.isLiveScroll()) {
+                table.loadLazyScrollData(0, table.getScrollRows());
+            } else {
+                table.loadLazyData();
+            }
         }
         else {
             if(table.isMultiSort())
