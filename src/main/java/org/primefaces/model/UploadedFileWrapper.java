@@ -67,6 +67,15 @@ public class UploadedFileWrapper implements UploadedFile, FacesWrapper<UploadedF
     }
 
     @Override
+    public String getDescription() {
+        throw new UnsupportedOperationException();
+    }
+
+    public String getTitle() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public UploadedFile getWrapped() {
         return wrapped;
     }

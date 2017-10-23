@@ -96,6 +96,10 @@ public class FileUploadRenderer extends CoreRenderer {
                 .attr("previewWidth", fileUpload.getPreviewWidth(), 80)
                 .attr("disabled", fileUpload.isDisabled(), false)
                 .attr("sequentialUploads", fileUpload.isSequential(), false)
+                .attr("descriptionLabel", fileUpload.getDescriptionLabel(), "Description")
+                .attr("withDescription", fileUpload.isWithDescription(), false)
+                .attr("titleLabel", fileUpload.getTitleLabel(), "Title")
+                .attr("withTitle", fileUpload.isWithTitle(), false)
                 .callback("onstart", "function()", fileUpload.getOnstart())
                 .callback("onerror", "function()", fileUpload.getOnerror())
                 .callback("oncomplete", "function(args)", fileUpload.getOncomplete());

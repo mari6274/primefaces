@@ -21,7 +21,7 @@ import java.io.InputStream;
 public interface UploadedFile {
 
 	public String getFileName();
-	
+
 	public InputStream getInputstream() throws IOException;
 	
 	public long getSize();
@@ -37,4 +37,8 @@ public interface UploadedFile {
      * @throws Exception If something went wrong.
      */
     public void write(String filePath) throws Exception;
+
+    public String getDescription();
+
+	public String getTitle();
 }

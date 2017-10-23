@@ -60,4 +60,12 @@ public class DefaultUploadedFile implements UploadedFile, Serializable {
         fileItem.write(new File(filePath));
     }
 
+	public String getDescription() {
+		throw new UnsupportedOperationException();
+	}
+
+	public String getTitle() {
+		throw new UnsupportedOperationException();
+	}
+
 }

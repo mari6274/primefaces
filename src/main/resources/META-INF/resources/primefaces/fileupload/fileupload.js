@@ -723,6 +723,12 @@
                         });
                     }
                 }
+                if(file.withDescription) {
+                    formData.append("org.primefaces.component.FileUpload.file_description", file.description.value);
+                }
+                if(file.withTitle){
+                    formData.append("org.primefaces.component.FileUpload.file_title", file.title.value);
+                }
                 options.data = formData;
             }
             // Blob reference is not needed anymore, free memory:
@@ -1713,6 +1719,10 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
         this.cfg.fileLimitMessage = this.cfg.fileLimitMessage || 'Maximum number of files exceeded';
         this.cfg.messageTemplate = this.cfg.messageTemplate || '{name} {size}';
         this.cfg.previewWidth = this.cfg.previewWidth || 80;
+        this.cfg.descriptionLabel = this.cfg.descriptionLabel || 'Description';
+        this.cfg.withDescription = this.cfg.withDescription || false;
+        this.cfg.titleLabel = this.cfg.titleLabel || 'Title';
+        this.cfg.withTitle = this.cfg.withTitle || false;
         this.uploadedFileCount = 0;
 
         this.renderMessages();
@@ -1752,7 +1762,6 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
             },
             add: function(e, data) {
                 $this.chooseButton.removeClass('ui-state-hover ui-state-focus');
-
                 if($this.fileAddIndex === 0) {
                     $this.clearMessages();
                 }
@@ -1777,14 +1786,37 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
                             filesize: file.size
                         });
                     }
-                    else {  
+                    else {
+                        var titleId = null;
+                        var descriptionId = null;
+                        if(!$this.rowSeq) {
+                            $this.rowSeq = 0;
+                        }
+
+                        if($this.cfg.withTitle) {
+                            titleId = $this.id + ":fileTitle-" + $this.rowSeq;
+                        }
+
+                        if($this.cfg.withDescription) {
+                            descriptionId = $this.id + ":fileDescription-" + $this.rowSeq;
+                        }
+
                         var row = $('<div class="ui-fileupload-row"></div>').append('<div class="ui-fileupload-preview"></td>')
                                 .append('<div>' + PrimeFaces.escapeHTML(file.name) + '</div>')
                                 .append('<div>' + $this.formatSize(file.size) + '</div>')
                                 .append('<div class="ui-fileupload-progress"></div>')
-                                .append('<div><button class="ui-fileupload-cancel ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"><span class="ui-button-icon-left ui-icon ui-icon ui-icon-close"></span><span class="ui-button-text">ui-button</span></button></div>')
-                                .appendTo($this.filesTbody);
-                        
+                                .append('<div><button class="ui-fileupload-cancel ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only"><span class="ui-button-icon-left ui-icon ui-icon ui-icon-close"></span><span class="ui-button-text">ui-button</span></button></div>');
+
+                        if(titleId)
+                            row =  row.append('<div class="ui-fileupload-file-title-container"><label class="ui-outputlabel ui-widget ui-file-upload-title-label">' + $this.cfg.titleLabel +'</label>' +
+                                '<input id="'+ titleId + '" type="text" maxlength="255" autocomplete="off" title="" onblur="return PrimeFaces.vi(this)" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all ui-file-upload-title-input" data-p-label="' + $this.cfg.titleLabel + '" role="textbox" aria-disabled="false" aria-readonly="false"></div>');
+
+                        if(descriptionId)
+                            row = row.append('<div class="ui-fileupload-file-description-container"><label class="ui-outputlabel ui-widget ui-file-upload-description-label">' + $this.cfg.descriptionLabel +'</label>' +
+                                '<textarea rows="2" id="'+ descriptionId + '" maxlength="255"  autocomplete="off" title="" onblur="return PrimeFaces.vi(this)" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all ui-file-upload-description-input" data-p-label="' + $this.cfg.descriptionLabel + '" aria-disabled="false" aria-readonly="false"></textarea></div>');
+
+                        row = row.appendTo($this.filesTbody);
+
                         if($this.filesTbody.children('.ui-fileupload-row').length > 1) {
                             $('<div class="ui-widget-content"></div>').prependTo(row);
                         }
@@ -1821,15 +1853,20 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
                         //progress
                         row.children('div.ui-fileupload-progress').append('<div class="ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="ui-progressbar-value ui-widget-header ui-corner-left" style="display: none; width: 0%;"></div></div>');
 
-                        file.row = row;
 
+                        file.row = row;
                         file.row.data('filedata', data);
+
+                        $this.ucfg.createFileInputProperties(file, "description", "withDescription", "fileDescription", "textarea");
+                        $this.ucfg.createFileInputProperties(file, "title", "withTitle", "fileTitle", "input");
 
                         $this.files.push(file);
 
                         if($this.cfg.auto) {
                             $this.upload();
                         }
+
+                        $this.rowSeq++;
                     }
 
                     if($this.files.length > 0) {
@@ -1842,6 +1879,11 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
                         $this.fileAddIndex = 0;
                     }
                 }
+            },
+            createFileInputProperties: function (file, propertyName, withPropertyName, id, type){
+                var input = file.row.find(type + "[id*='" + id + "']");
+                file[propertyName]= input && input[0];
+                file[withPropertyName] = $this.cfg[withPropertyName];
             },
             send: function(e, data) {
                 if(!window.FormData) {

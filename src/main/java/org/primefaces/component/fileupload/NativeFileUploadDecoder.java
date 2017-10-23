@@ -15,6 +15,7 @@
  */
 package org.primefaces.component.fileupload;
 
+import java.io.File;
 import java.io.IOException;
 import javax.faces.FacesException;
 import javax.faces.context.FacesContext;
@@ -62,9 +63,10 @@ public class NativeFileUploadDecoder {
     private static void decodeAdvanced(FacesContext context, FileUpload fileUpload, HttpServletRequest request) throws IOException, ServletException {
         String clientId = fileUpload.getClientId(context);
         Part part = request.getPart(clientId);
-
+        Part titlePart = request.getPart(FileUpload.COMPONENT_TITLE_PART);
+        Part descriptionPart = request.getPart(FileUpload.COMPONENT_DESCRIPTION_PART);
         if(part != null) {
-            fileUpload.queueEvent(new FileUploadEvent(fileUpload, new NativeUploadedFile(part)));
+            fileUpload.queueEvent(new FileUploadEvent(fileUpload,  new NativeUploadedFile(part, titlePart, descriptionPart)));
         }
     }
 

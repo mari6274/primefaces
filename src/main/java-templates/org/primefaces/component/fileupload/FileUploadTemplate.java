@@ -12,6 +12,9 @@
     
     public final static String MOBILE_CONTAINER_CLASS = "ui-fileupload ui-input-text ui-body-inherit ui-corner-all ui-shadow-inset";
 
+    public final static String COMPONENT_DESCRIPTION_PART = "org.primefaces.component.FileUpload.file_description";
+    public final static String COMPONENT_TITLE_PART = "org.primefaces.component.FileUpload.file_title";
+
     public void broadcast(javax.faces.event.FacesEvent event) throws javax.faces.event.AbortProcessingException {
 		super.broadcast(event);
 		

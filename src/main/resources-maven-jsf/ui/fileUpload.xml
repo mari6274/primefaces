@@ -203,6 +203,34 @@
             <defaultValue>false</defaultValue>
             <description>Uploads are concurrent by default set this option to true for sequential uploads.</description>
 		</attribute>
+		<attribute>
+			<name>descriptionLabel</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+			<defaultValue>Description</defaultValue>
+			<description>Label for description input.</description>
+		</attribute>
+		<attribute>
+			<name>withDescription</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+			<defaultValue>false</defaultValue>
+			<description>Determines if show description input of file.</description>
+		</attribute>
+		<attribute>
+			<name>titleLabel</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+			<defaultValue>Title</defaultValue>
+			<description>Label for title input of file.</description>
+		</attribute>
+		<attribute>
+			<name>withTitle</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+			<defaultValue>false</defaultValue>
+			<description>Determines if show title input.</description>
+		</attribute>
 	</attributes>
 	<resources>
         <resource>

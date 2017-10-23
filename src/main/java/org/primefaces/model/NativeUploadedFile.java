@@ -15,6 +15,8 @@
  */
 package org.primefaces.model;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,7 +29,9 @@ public class NativeUploadedFile implements UploadedFile, Serializable {
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 4;
 
     private Part part;
+    private String title;
     private String filename;
+    private String description;
     private byte[] cachedContent;
 
     public NativeUploadedFile() {}
@@ -35,6 +39,13 @@ public class NativeUploadedFile implements UploadedFile, Serializable {
     public NativeUploadedFile(Part part) {
         this.part = part;
         this.filename = resolveFilename(part);
+    }
+
+    public NativeUploadedFile(Part part, Part titlePart, Part descriptionPart) {
+        this.part = part;
+        this.filename = resolveFilename(part);
+        this.title = resolveStringPart(titlePart);
+        this.description = resolveStringPart(descriptionPart);
     }
 
     public String getFileName() {
@@ -97,8 +108,27 @@ public class NativeUploadedFile implements UploadedFile, Serializable {
         return null;
     }
 
+    private String resolveStringPart(Part part) {
+        if(part != null) {
+            try {
+                String result = IOUtils.toString(part.getInputStream());
+                return result != null ? result : "";
+            } catch (IOException e) {
+            }
+        }
+        return null;
+    }
+
     public void write(String filePath) throws Exception {
         part.write(filePath);
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public Part getPart() {
