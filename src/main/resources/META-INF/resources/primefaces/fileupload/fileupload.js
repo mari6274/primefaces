@@ -1809,7 +1809,7 @@ PrimeFaces.widget.FileUpload = PrimeFaces.widget.BaseWidget.extend({
 
                         if(titleId)
                             row =  row.append('<div class="ui-fileupload-file-title-container"><label class="ui-outputlabel ui-widget ui-file-upload-title-label">' + $this.cfg.titleLabel +'</label>' +
-                                '<input id="'+ titleId + '" type="text" maxlength="255" autocomplete="off" title="" onblur="return PrimeFaces.vi(this)" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all ui-file-upload-title-input" data-p-label="' + $this.cfg.titleLabel + '" role="textbox" aria-disabled="false" aria-readonly="false"></div>');
+                                '<input id="'+ titleId + '" type="text" maxlength="30" autocomplete="off" title="" onblur="return PrimeFaces.vi(this)" class="ui-inputfield ui-inputtext ui-widget ui-state-default ui-corner-all ui-file-upload-title-input" data-p-label="' + $this.cfg.titleLabel + '" role="textbox" aria-disabled="false" aria-readonly="false"></div>');
 
                         if(descriptionId)
                             row = row.append('<div class="ui-fileupload-file-description-container"><label class="ui-outputlabel ui-widget ui-file-upload-description-label">' + $this.cfg.descriptionLabel +'</label>' +
