@@ -257,8 +257,12 @@ public class SelectCheckboxMenuRenderer extends SelectManyRenderer {
             .attr("showHeader", menu.isShowHeader(), true)
             .attr("updateLabel", menu.isUpdateLabel(), false)
             .attr("multiple", menu.isMultiple(), false) 
-            .attr("appendTo", SearchExpressionFacade.resolveClientId(context, menu, menu.getAppendTo()), null);
-        
+            .attr("appendTo", SearchExpressionFacade.resolveClientId(context, menu, menu.getAppendTo()), null)
+            // AASYS
+            .attr("emptyMultipleLabel", (String) menu.getAttributes().get("emptyMultipleLabel"), null)
+            .attr("fullMultipleLabel", (String) menu.getAttributes().get("fullMultipleLabel"), null);
+            // AASYS
+
         if(menu.isFilter()) {
             wb.attr("filter", true)
                 .attr("filterMatchMode", menu.getFilterMatchMode(), null)

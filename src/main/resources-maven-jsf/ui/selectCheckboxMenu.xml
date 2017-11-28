@@ -147,6 +147,16 @@
 			<type>java.lang.Boolean</type>
             <defaultValue>false</defaultValue>
         </attribute>
+  <attribute>
+      <name>emptyMultipleLabel</name>
+      <required>false</required>
+			<type>java.lang.String</type>
+  </attribute>
+	<attribute>
+			<name>fullMultipleLabel</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+	</attribute>
 	</attributes>
     <resources>
         <resource>
