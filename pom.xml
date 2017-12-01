@@ -11,7 +11,7 @@
     <groupId>org.primefaces</groupId>
     <artifactId>primefaces</artifactId>
     <packaging>jar</packaging>
-    <version>6.1.5C-AASYS</version>
+    <version>6.1.6A-AASYS</version>
     <name>primefaces</name>
     <url>http://www.primefaces.org</url>
 
