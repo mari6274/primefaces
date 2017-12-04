@@ -237,6 +237,20 @@
 			<defaultValue>true</defaultValue>
 			<description>When false, buttons are not rendered</description>
 		</attribute>
+		<attribute>
+			<name>renderSource</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+			<defaultValue>true</defaultValue>
+			<description>When false, source is not rendered</description>
+		</attribute>
+		<attribute>
+			<name>renderTarget</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+			<defaultValue>true</defaultValue>
+			<description>When false, target is not rendered</description>
+		</attribute>
 	</attributes>
 	    <resources>
         <resource>

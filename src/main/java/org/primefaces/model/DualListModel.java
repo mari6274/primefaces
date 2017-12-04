@@ -6,8 +6,8 @@ import java.util.List;
 
 public class DualListModel<T> implements Serializable {
 
-	private List<T> source = new ArrayList<T>();
-	private List<T> target = new ArrayList<T>();
+    protected List<T> source = new ArrayList<T>();
+	protected List<T> target = new ArrayList<T>();
 	
 	public DualListModel() {}
 	
