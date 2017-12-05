@@ -797,10 +797,13 @@ import org.primefaces.component.datatable.TableState;
         
         boolean hasRowKeyVe = this.getValueExpression(PropertyKeys.rowKey.toString()) != null;
         DataModel model = getDataModel();
- 
+
+        if (model instanceof SelectableDataModel) {
+            return ((SelectableDataModel) model).getRowData(rowKey);
+        }
         // use rowKey if available and if != lazy
         // lazy must implement #getRowData
-        if (hasRowKeyVe && !(model instanceof LazyDataModel)) {
+        else if (hasRowKeyVe && !(model instanceof LazyDataModel)) {
             Map<String,Object> requestMap = getFacesContext().getExternalContext().getRequestMap();
             String var = this.getVar();
             Collection data = (Collection) getDataModel().getWrappedData();
@@ -819,11 +822,7 @@ import org.primefaces.component.datatable.TableState;
             return null;
         }
         else {
-            if(!(model instanceof SelectableDataModel)) {
-                throw new FacesException("DataModel must implement org.primefaces.model.SelectableDataModel when selection is enabled or you need to define rowKey attribute");
-            }
-
-            return ((SelectableDataModel) model).getRowData(rowKey);
+            throw new FacesException("DataModel must implement org.primefaces.model.SelectableDataModel when selection is enabled or you need to define rowKey attribute");
         }
     }
 
