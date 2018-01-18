@@ -473,26 +473,31 @@ PrimeFaces.widget.TreeTable = PrimeFaces.widget.DeferredWidget.extend({
             collapseBehavior.call(this, ext);
         }
     },
-    
+
+    // Fix for handle row click on treetable when row edit and selectable row features are enabled.
+    // This method is copied from Primefaces source with changed condition.
+    // http://geek-and-poke.com/geekpoke-gets-serious/2014/2/23/primefaces-datatables-with-in-table-editing-row-mode-and-single-selection
     onRowClick: function(event, node) {
-        if($(event.target).is('td,span:not(.ui-c)')) {
+        $(event.target)
+
+        if ($(event.target).is('td,span:not(.ui-c),div.ui-cell-editor-output')) {
             var selected = node.hasClass('ui-state-highlight'),
-            metaKey = event.metaKey||event.ctrlKey,
-            shiftKey = event.shiftKey;
-            
-            if(this.isCheckboxSelection()) {
+                metaKey = event.metaKey || event.ctrlKey,
+                shiftKey = event.shiftKey;
+
+            if (this.isCheckboxSelection()) {
                 this.toggleCheckboxNode(node);
             }
             else {
-                if(selected && metaKey) {
+                if (selected && metaKey) {
                     this.unselectNode(node);
                 }
                 else {
-                    if(this.isSingleSelection()||(this.isMultipleSelection() && !metaKey)) {
+                    if (this.isSingleSelection() || (this.isMultipleSelection() && !metaKey)) {
                         this.unselectAllNodes();
                     }
 
-                    if(this.isMultipleSelection() && shiftKey) {
+                    if (this.isMultipleSelection() && shiftKey) {
                         this.selectNodesInRange(node);
                     }
                     else {
@@ -501,10 +506,8 @@ PrimeFaces.widget.TreeTable = PrimeFaces.widget.DeferredWidget.extend({
                     }
                 }
             }
-            
-            if(this.cfg.disabledTextSelection) {
-                PrimeFaces.clearSelection();
-            }
+
+            PrimeFaces.clearSelection();
         }
     },
             

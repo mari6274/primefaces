@@ -107,6 +107,8 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
     /**
      * Binds events for multiple selection mode
      */
+
+    //Single mode with chips of autocomplete.
     setupMultipleMode: function() {
         var $this = this;
         this.multiItemContainer = this.jq.children('ul');
@@ -140,6 +142,17 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
             }
             $this.removeItem(event, $(this).parent());
         });
+
+        // AASYS for "single mode with chips" setting permit only ONE chips
+        var attribute = this.input[0].attributes["swc"];
+        var isSingleModeWithChips = attribute != null && attribute.value == 'T';
+        if(isSingleModeWithChips && this.hinput[0].value.length > 0) {
+            var maxLength = document.createAttribute("maxlength")
+            maxLength.value = 0;
+            this.input[0].attributes.setNamedItem(maxLength);
+            this.cfg.active = false;
+        }
+        // AASYS
     },
 
     bindStaticEvents: function() {
@@ -238,7 +251,8 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
             this.dropdown.prop('disabled', false).removeClass('ui-state-disabled');
         }
     },
-    
+
+    //Single mode with chips of autocomplete.
     bindKeyEvents: function() {
         var $this = this;
 
@@ -247,22 +261,22 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
                 $this.processKeyEvent(e);
             });
         }
-        
+
         this.input.on('keyup.autoComplete', function(e) {
             var keyCode = $.ui.keyCode,
-            key = e.which;
-            
+                key = e.which;
+
             if(PrimeFaces.isIE(9) && key === keyCode.BACKSPACE) {
                 $this.processKeyEvent(e);
             }
-            
+
             if($this.cfg.queryEvent === 'enter' && (key === keyCode.ENTER || key === keyCode.NUMPAD_ENTER)) {
                 if($this.itemSelectedWithEnter)
                     $this.itemSelectedWithEnter = false;
                 else
                     $this.search($this.input.val());
             }
-            
+
             if($this.panel.is(':visible')) {
                 if(key === keyCode.ESCAPE) {
                     $this.hide();
@@ -325,7 +339,7 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
                         if ($this.timeout) {
                             $this.deleteTimeout();
                         }
-                    
+
                         highlightedItem.click();
 
                         e.preventDefault();
@@ -351,26 +365,33 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
                         if ($this.timeout) {
                             $this.deleteTimeout();
                         }
-                    break;
-                    
+                        break;
+
                     case keyCode.ENTER:
-                    case keyCode.NUMPAD_ENTER:                        
+                    case keyCode.NUMPAD_ENTER:
                         if($this.cfg.queryEvent === 'enter' || ($this.timeout > 0) || $this.querying) {
                             e.preventDefault();
                         }
-                    break;
-                    
+                        break;
+
                     case keyCode.BACKSPACE:
-                        if ($this.cfg.multiple && !$this.input.val().length) {
+                    {
+                        // AASYS permit bakcspace in single mode with chips
+                        var attribute = this.attributes['swc'];
+                        var singleModeWithChip = attribute != null && attribute.value == 'T';
+                        if (($this.cfg.multiple && !$this.input.val().length) || singleModeWithChip) {
+                            // AASYS
                             $this.removeItem(e, $(this).parent().prev());
 
                             e.preventDefault();
                         }
-                    break;
+                    }
+                        break;
                 };
             }
-            
+
         });
+
     },
 
     bindDynamicEvents: function() {
@@ -611,76 +632,65 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
             this.search('');
     },
 
-    search: function(query) {
-        //allow empty string but not undefined or null
-        if(!this.cfg.active || query === undefined || query === null) {
-            return;
+    //Disables searching empty string
+    search: function(c) {
+        if (!this.cfg.active || c === undefined || c === null || (isSearchingDisabled(this, c))) {
+            return
         }
-
-        if(this.cfg.cache && this.cache[query]) {
-            this.panel.html(this.cache[query]);
-            this.showSuggestions(query);
-            return;
+        if (this.cfg.cache && this.cache[c]) {
+            this.panel.html(this.cache[c]);
+            this.showSuggestions(c);
+            return
         }
-
-        if(!this.active) {
-            return;
+        if (!this.active) {
+            return
         }
-        
         this.querying = true;
-
-        var $this = this;
-
-        if(this.cfg.itemtip) {
-            this.itemtip.hide();
+        var d = this;
+        if (this.cfg.itemtip) {
+            this.itemtip.hide()
         }
-
-        var options = {
+        var b = {
             source: this.id,
             process: this.id,
             update: this.id,
             formId: this.cfg.formId,
-            onsuccess: function(responseXML, status, xhr) {
-                PrimeFaces.ajax.Response.handle(responseXML, status, xhr, {
-                    widget: $this,
-                    handle: function(content) {
-                        this.panel.html(content);
-
-                        if(this.cfg.cache) {
-                            this.cache[query] = content;
+            onsuccess: function(g, e, f) {
+                PrimeFaces.ajax.Response.handle(g, e, f, {
+                    widget: d,
+                    handle: function(h) {
+                        this.panel.html(h);
+                        if (this.cfg.cache) {
+                            this.cache[c] = h
                         }
-
-                        this.showSuggestions(query);
+                        this.showSuggestions(c)
                     }
                 });
-
-                return true;
+                return true
             },
             oncomplete: function() {
-                $this.querying = false;
+                d.querying = false
             }
         };
-
-        options.params = [
-          {name: this.id + '_query', value: query}
-        ];
-
-        if(this.hasBehavior('query')) {
-            var queryBehavior = this.cfg.behaviors['query'];
-            queryBehavior.call(this, options);
-        }
-        else {
-            PrimeFaces.ajax.AjaxRequest(options);
+        b.params = [{
+            name: this.id + "_query",
+            value: c
+        }];
+        if (this.hasBehavior("query")) {
+            var a = this.cfg.behaviors.query;
+            a.call(this, b)
+        } else {
+            PrimeFaces.ajax.AjaxRequest(b)
         }
     },
 
     show: function() {
         this.alignPanel();
-
-        if(this.cfg.effect)
-            this.panel.show(this.cfg.effect, {}, this.cfg.effectDuration);
-        else
-            this.panel.show();
+        if(!this.panel.width() || this.panel.width() < this.jq.width()){
+            this.panel.width(this.jq.width());
+        }
+        this.panel.show();
+        this.postShow()
     },
 
     hide: function() {
@@ -930,6 +940,11 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
     deleteTimeout: function() {
         clearTimeout(this.timeout);
         this.timeout = null;
+    },
+
+    //for pure autocomplete when user enter empty string (f.e. backspacing string) - do not search
+    isSearchingDisabled: function (autocomplete, c) {
+        return autocomplete.dropdown.length == 0 && c == "";
     }
 
 });

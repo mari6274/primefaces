@@ -712,32 +712,45 @@ if (window.PrimeFaces) {
     };
 
     PrimeFaces.validateInstant = function(el) {
+        var parentClientId = null;
         var vc = PrimeFaces.util.ValidationContext,
-        element = (typeof el === 'string') ? $(PrimeFaces.escapeClientId(el)) : $(el),
-        clientId = element.data(PrimeFaces.CLIENT_ID_DATA)||element.attr('id'),
-        uiMessageId = element.data('uimessageid'),
-        uiMessage = null;
+            element = (typeof el === 'string') ? $(PrimeFaces.escapeClientId(el)) : $(el);
+        // if element type is hidden get parent ClientId to resolve uiMessage
+        if (element[0].type === "hidden") {
+            var parentElement = element.parent();
+            if (parentElement !== null || parentElement !== undefined) {
+                parentClientId = parentElement.data(PrimeFaces.CLIENT_ID_DATA) || parentElement.attr('id');
+            }
+        }
+        var clientId = element.data(PrimeFaces.CLIENT_ID_DATA) || element.attr('id'),
+            uiMessageId = element.data('uimessageid'),
+            uiMessage = null;
 
-        if(uiMessageId) {
-            uiMessage = (uiMessageId === 'p-nouimessage') ? null: $(PrimeFaces.escapeClientId(uiMessageId));
+        if (uiMessageId) {
+            uiMessage = (uiMessageId === 'p-nouimessage') ? null : $(PrimeFaces.escapeClientId(uiMessageId));
         }
         else {
-            uiMessage = vc.findUIMessage(clientId, element.closest('form').find('div.ui-message'));
+            if (parentClientId === null) {
+                uiMessage = vc.findUIMessage(clientId, element.closest('form').find('div.ui-message'));
+            } else {
+                uiMessage = vc.findUIMessage(parentClientId, element.closest('form').find('div.ui-message'));
+            }
 
-            if(uiMessage)
+
+            if (uiMessage)
                 element.data('uimessageid', uiMessage.attr('id'));
             else
                 element.data('uimessageid', 'p-nouimessage');
         }
 
-        if(uiMessage) {
+        if (uiMessage) {
             uiMessage.html('').removeClass('ui-message-error ui-message-icon-only ui-widget ui-corner-all ui-helper-clearfix');
         }
 
         this.validateInput(element);
 
-        if(!vc.isEmpty()) {
-            if(uiMessage) {
+        if (!vc.isEmpty()) {
+            if (uiMessage && vc.messages[clientId][0] !== null) {
                 vc.renderUIMessage(uiMessage, vc.messages[clientId][0]);
             }
 

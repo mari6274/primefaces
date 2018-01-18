@@ -3182,7 +3182,9 @@ PrimeFaces.widget.SelectCheckboxMenu = PrimeFaces.widget.BaseWidget.extend({
         // AASYS Add multiple item for empty value
         if(this.cfg.multiple) {
             this.addCustomMultipleItemIfNeeded();
-            this.getSelectedItems().each((index, item) => this.createMultipleItem($(item)));
+            this.getSelectedItems().each(function (index, item) {
+                return this.createMultipleItem($(item));
+            });
         }
         // AASYS
     },

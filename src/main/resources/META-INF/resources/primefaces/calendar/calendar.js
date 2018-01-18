@@ -148,27 +148,32 @@ PrimeFaces.widget.Calendar = PrimeFaces.widget.BaseWidget.extend({
     },
 
     bindDateSelectListener: function() {
-        var _self = this;
+        var calendar = this;
 
-        this.cfg.onSelect = function() {
-            if(_self.cfg.popup) {
-                _self.fireDateSelectEvent();
+        this.cfg.onSelect = function () {
+            if (calendar.cfg.popup) {
+                calendar.fireDateSelectEvent(true); // Added autoFocus attribute
             }
             else {
-                var newDate = $.datepicker.formatDate(_self.cfg.dateFormat, _self.getDate());
+                var newDate = $.datepicker.formatDate(calendar.cfg.dateFormat, calendar.getDate());
 
-                _self.input.val(newDate);
-                _self.fireDateSelectEvent();
+                calendar.input.val(newDate);
+                calendar.fireDateSelectEvent(false); // Added autoFocus attribute
             }
         };
     },
 
-    fireDateSelectEvent: function() {
-        if(this.cfg.behaviors) {
+    fireDateSelectEvent: function(autoFocus) {
+        if (this.cfg.behaviors) {
             var dateSelectBehavior = this.cfg.behaviors['dateSelect'];
 
-            if(dateSelectBehavior) {
+            if (dateSelectBehavior) {
                 dateSelectBehavior.call(this);
+
+                // Set focus when date is selected and calendar contains time picker.
+                // It is necessary because time sliders remove focus from input and tab key doesn't work.
+                if (autoFocus && this.hasTimePicker())
+                    this.input.focus();
             }
         }
     },
@@ -201,10 +206,14 @@ PrimeFaces.widget.Calendar = PrimeFaces.widget.BaseWidget.extend({
 
     configureTimePicker: function() {
         var pattern = this.cfg.dateFormat,
-        timeSeparatorIndex = pattern.toLowerCase().indexOf('h');
+            timeSeparatorIndex = pattern.toLowerCase().indexOf('h');
 
         this.cfg.dateFormat = pattern.substring(0, timeSeparatorIndex - 1);
         this.cfg.timeFormat = pattern.substring(timeSeparatorIndex, pattern.length);
+
+        //When timeOnly is set to true then dateFormat is empty string but jQuery used it in formatting function
+        if(this.cfg.timeOnly)
+            this.cfg.dateFormat = this.cfg.timeFormat;
 
         //ampm
         if(this.cfg.timeFormat.indexOf('TT') != -1) {
@@ -246,7 +255,8 @@ PrimeFaces.widget.Calendar = PrimeFaces.widget.BaseWidget.extend({
     },
 
     hasTimePicker: function() {
-        return this.cfg.dateFormat.toLowerCase().indexOf('h') != -1;
+        // PrimeFaces checks only dateFormat but timeFormat has information about time picker
+        return this.cfg.dateFormat.toLowerCase().indexOf('h') != -1 || (this.cfg.timeFormat && this.cfg.timeFormat.toLowerCase().indexOf('h') != -1);
     },
 
     setDate: function(date) {
@@ -271,6 +281,21 @@ PrimeFaces.widget.Calendar = PrimeFaces.widget.BaseWidget.extend({
         }
 
         return false;
+    },
+
+    // Brand new function in calendar
+    isValid: function () {
+        if (!this.jqEl.val())
+            return true;
+
+        var dateElements = [];
+        if (!this.cfg.timeOnly && this.cfg.dateFormat) {
+            dateElements.push(convertDateFormatFromJsToMoment(this.cfg.dateFormat));
+        }
+        if (this.cfg.timeFormat)
+            dateElements.push(this.cfg.timeFormat);
+        var pattern = dateElements.join(" ");
+        return moment(this.jqEl.val(), pattern, true).isValid();
     }
 
 });

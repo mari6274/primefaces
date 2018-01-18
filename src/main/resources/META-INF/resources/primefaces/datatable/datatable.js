@@ -457,27 +457,60 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
             this.bindRowEvents();
         }
     },
-    
+
+    //Manual handling of single and double click events.
+    //Invokes proper methods set in dataTableCore.xhtml, depending on widgetVar.
+
     bindRowEvents: function() {
         var $this = this;
+        var datatableWidgetPrefix = $this.widgetVar.split("-").join("");
 
         this.bindRowHover(this.rowSelector);
 
-        this.tbody.off('click.dataTable mousedown.dataTable', this.rowSelector).on('mousedown.dataTable', this.rowSelector, null, function(e) {
-            $this.mousedownOnRow = true;
-        })
-        .on('click.dataTable', this.rowSelector, null, function(e) {
-            $this.onRowClick(e, this);
-            $this.mousedownOnRow = false;
-        });
-        
-        //double click
-        if(this.hasBehavior('rowDblselect')) {
-            this.tbody.off('dblclick.dataTable', this.rowSelector).on('dblclick.dataTable', this.rowSelector, null, function(e) {
-                $this.onRowDblclick(e, $(this));
+        var singleClick = false, DELAY = 300, timer = null;
+
+        this.tbody.off('click.dataTable mousedown.dataTable', this.rowSelector)
+            .on('mousedown.dataTable', this.rowSelector, null, function(e) {
+                $this.mousedownOnRow = true;
+            })
+            .on('click.dataTable', this.rowSelector, null, function(e) {
+                //Copied filter from onRowClick method, to filter out clicks on clickable elements positioned on row (checkbox, button etc.)
+                //It is necessary to have this check also in this method, due to implementation of double click and to preserve responsiveness of clicking
+                if (!$(e.target).is('td:not(.ui-column-unselectable),span:not(.ui-c),div.ui-cell-editor-output')){
+                    return;
+                }
+
+                var $that = this;
+
+                singleClick = !singleClick;
+
+                if(singleClick){
+                    $this.onRowClick(e, $that);
+                    $this.mousedownOnRow = false;
+
+                    timer = setTimeout(function(){
+                        singleClick = false;
+
+                        var selectCallback = window[datatableWidgetPrefix + "DTRowSelect"];
+                        if(selectCallback != undefined){
+                            selectCallback();
+                        }
+                    }, DELAY)
+                }
+                else{
+                    clearTimeout(timer);
+                    $this.unselectAllRows();
+                    $this.selectRow($($that), true);
+
+                    $this.onRowDblclick(e, $($that));
+
+                    var doubleClickCallback = window[datatableWidgetPrefix + "DTRowDoubleClick"];
+                    if(doubleClickCallback != undefined){
+                        doubleClickCallback();
+                    }
+                }
             });
-        };
-        
+
         this.bindSelectionKeyEvents();
     },
     
@@ -1522,29 +1555,33 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
             PrimeFaces.ajax.AjaxRequest(options); 
         }
     },
-    
+
+// Fix for handle row click on datatable when row edit and selectable row features are enabled.
+// This method is copied from Primefaces source with changed condition.
+// http://geek-and-poke.com/geekpoke-gets-serious/2014/2/23/primefaces-datatables-with-in-table-editing-row-mode-and-single-selection
+
     onRowClick: function(event, rowElement, silent) {
         //Check if rowclick triggered this event not a clickable element in row content
-        if($(event.target).is('td:not(.ui-column-unselectable),span:not(.ui-c)')) {
+        if ($(event.target).is('td:not(.ui-column-unselectable),span:not(.ui-c),div.ui-cell-editor-output')) {
             var row = $(rowElement),
-            selected = row.hasClass('ui-state-highlight'),
-            metaKey = event.metaKey||event.ctrlKey,
-            shiftKey = event.shiftKey;
-    
+                selected = row.hasClass('ui-state-highlight'),
+                metaKey = event.metaKey || event.ctrlKey,
+                shiftKey = event.shiftKey;
+
             this.assignFocusedRow(row);
 
             //unselect a selected row if metakey is on
-            if(selected && metaKey) {
+            if (selected && metaKey) {
                 this.unselectRow(row, silent);
             }
             else {
                 //unselect previous selection if this is single selection or multiple one with no keys
-                if(this.isSingleSelection() || (this.isMultipleSelection() && event && !metaKey && !shiftKey && this.cfg.rowSelectMode === 'new' )) {
+                if (this.isSingleSelection() || (this.isMultipleSelection() && event && !metaKey && !shiftKey && this.cfg.rowSelectMode === 'new' )) {
                     this.unselectAllRows();
                 }
-                
+
                 //range selection with shift key
-                if(this.isMultipleSelection() && event && event.shiftKey) {                    
+                if (this.isMultipleSelection() && event && event.shiftKey) {
                     this.selectRowsInRange(row);
                 }
                 //select current row
@@ -1553,9 +1590,9 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
                     this.cursorIndex = null;
                     this.selectRow(row, silent);
                 }
-            } 
+            }
 
-            if(this.cfg.disabledTextSelection) {
+            if (this.cfg.disabledTextSelection) {
                 PrimeFaces.clearSelection();
             }
         }
