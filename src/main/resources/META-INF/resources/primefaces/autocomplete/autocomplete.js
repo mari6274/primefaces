@@ -108,7 +108,13 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
      * Binds events for multiple selection mode
      */
 
-    //Single mode with chips of autocomplete.
+    //for pure autocomplete when user enter empty string (f.e. backspacing string) - do not search
+    isSearchingDisabled: function(autocomplete, c) {
+        return autocomplete.dropdown.length == 0 && c == "";
+    },
+
+    /*Single mode with chips of autocomplete.*/
+
     setupMultipleMode: function() {
         var $this = this;
         this.multiItemContainer = this.jq.children('ul');
@@ -940,11 +946,6 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
     deleteTimeout: function() {
         clearTimeout(this.timeout);
         this.timeout = null;
-    },
-
-    //for pure autocomplete when user enter empty string (f.e. backspacing string) - do not search
-    isSearchingDisabled: function (autocomplete, c) {
-        return autocomplete.dropdown.length == 0 && c == "";
     }
 
 });
