@@ -687,11 +687,17 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
 
     show: function() {
         this.alignPanel();
-        if(!this.panel.width() || this.panel.width() < this.jq.width()){
-            this.panel.width(this.jq.width());
+
+        this.panel.css('z-index', ++PrimeFaces.zindex);
+
+        if($.browser.msie && /^[6,7]\.[0-9]+/.test($.browser.version)) {
+            this.panel.parent().css('z-index', PrimeFaces.zindex - 1);
         }
-        this.panel.show();
-        this.postShow()
+
+        if(this.cfg.effect)
+            this.panel.show(this.cfg.effect, {}, this.cfg.effectDuration);
+        else
+            this.panel.show();
     },
 
     hide: function() {

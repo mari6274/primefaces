@@ -431,6 +431,7 @@
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/core/core.dialog.js</include>
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/accordion/accordion.js</include>
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/autocomplete/autocomplete.js</include>
+                                <include>${project.build.directory}/classes/META-INF/resources/primefaces/selectcheckboxmenu/selectcheckboxmenu.js</include>
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/blockui/blockui.js</include>
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/calendar/calendar.js</include>
                                 <include>${project.build.directory}/classes/META-INF/resources/primefaces/carousel/carousel.js</include>
