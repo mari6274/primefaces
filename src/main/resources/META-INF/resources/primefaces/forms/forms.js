@@ -3175,6 +3175,7 @@ PrimeFaces.widget.SelectCheckboxMenu = PrimeFaces.widget.BaseWidget.extend({
     },
 
     removeMultipleItem: function(item) {
+        var self = this;
         var items = this.multiItemContainer.children();
         if(items.length) {
             items.filter('[data-item-value="' + item.data('item-value') + '"]').remove();
@@ -3183,7 +3184,7 @@ PrimeFaces.widget.SelectCheckboxMenu = PrimeFaces.widget.BaseWidget.extend({
         if(this.cfg.multiple) {
             this.addCustomMultipleItemIfNeeded();
             this.getSelectedItems().each(function (index, item) {
-                return this.createMultipleItem($(item));
+                return self.createMultipleItem($(item));
             });
         }
         // AASYS
