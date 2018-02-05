@@ -253,8 +253,18 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
             PrimeFaces.clearSelection();
                             
             var columnHeader = $(this),
-            sortOrderData = columnHeader.data('sortorder'),
-            sortOrder = (sortOrderData === $this.SORT_ORDER.UNSORTED) ? $this.SORT_ORDER.ASCENDING : -1 * sortOrderData,
+            sortOrderData = columnHeader.data('sortorder');
+            //AASYS Added returning to UNSORTED option
+            if (sortOrderData === $this.SORT_ORDER.UNSORTED) {
+                sortOrder = $this.SORT_ORDER.ASCENDING;
+            }
+            else if (sortOrderData === $this.SORT_ORDER.ASCENDING) {
+                sortOrder = $this.SORT_ORDER.DESCENDING;
+            }
+            else {
+                sortOrder = $this.SORT_ORDER.UNSORTED;
+            }
+            //AASYS
             metaKey = e.metaKey||e.ctrlKey||metaKeyOn;
             
             if($this.cfg.multiSort) {
@@ -1442,7 +1452,11 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
                         sortIcon.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-n');
                         columnHeader.attr('aria-sort', 'ascending').attr('aria-label', $this.getSortMessage(ariaLabel, $this.descMessage));
                         $(PrimeFaces.escapeClientId(columnHeader.attr('id') + '_clone')).attr('aria-sort', 'ascending').attr('aria-label', $this.getSortMessage(ariaLabel, $this.descMessage));
-                    }
+                    } else { //AASYS added restoring default option (UNSORTED)
+                        sortIcon.removeClass('ui-icon-triangle-1-n');
+                        sortIcon.removeClass('ui-icon-triangle-1-s');
+                        columnHeader.removeClass('ui-state-active');
+                    }//AASYS
                 }
                 
                 if($this.cfg.clientCache) {
