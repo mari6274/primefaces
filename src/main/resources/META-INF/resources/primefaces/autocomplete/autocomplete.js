@@ -788,10 +788,12 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
             }
             
             for(var i = 0; i < $this.currentItems.length; i++) {
-                var stripedItem = $this.currentItems[i].replace(/\r?\n/g, '');
-                if(stripedItem === value) {
-                    valid = true;
-                    break;
+                if ($this.currentItems[i] != null) {
+                    var stripedItem = $this.currentItems[i].replace(/\r?\n/g, '');
+                    if (stripedItem === value) {
+                        valid = true;
+                        break;
+                    }
                 }
             }
 
