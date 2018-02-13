@@ -468,9 +468,13 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
         }
     },
 
+    //Custom method used to check if clicked element should invoke onRowClick and onRowDblclick
+    isClickableElement: function(event){
+        return $(event.target).is('td:not(.ui-column-unselectable),span:not(.ui-c),div.ui-cell-editor-output,[is_click_pass_through="true"]');
+    },
+
     //Manual handling of single and double click events.
     //Invokes proper methods set in dataTableCore.xhtml, depending on widgetVar.
-
     bindRowEvents: function() {
         var $this = this;
         var datatableWidgetPrefix = $this.widgetVar.split("-").join("");
@@ -486,7 +490,7 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
             .on('click.dataTable', this.rowSelector, null, function(e) {
                 //Copied filter from onRowClick method, to filter out clicks on clickable elements positioned on row (checkbox, button etc.)
                 //It is necessary to have this check also in this method, due to implementation of double click and to preserve responsiveness of clicking
-                if (!$(e.target).is('td:not(.ui-column-unselectable),span:not(.ui-c),div.ui-cell-editor-output')){
+                if (!$this.isClickableElement(e)){
                     return;
                 }
 
@@ -1586,7 +1590,7 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
     onRowClick: function(event, rowElement, silent) {
         //Check if rowclick triggered this event not a clickable element in row content
-        if ($(event.target).is('td:not(.ui-column-unselectable),span:not(.ui-c),div.ui-cell-editor-output')) {
+        if (this.isClickableElement(event)) {
             var row = $(rowElement),
                 selected = row.hasClass('ui-state-highlight'),
                 metaKey = event.metaKey || event.ctrlKey,

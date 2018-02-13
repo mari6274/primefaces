@@ -162,7 +162,7 @@ public class ComponentUtils {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         UIComponent component = ComponentTraversalUtils.firstWithId(id, facesContext.getViewRoot());
 
-        return component.getClientId(facesContext);
+        return component != null ? component.getClientId(facesContext) : null;
     }
 
     public static String escapeJQueryId(String id) {
