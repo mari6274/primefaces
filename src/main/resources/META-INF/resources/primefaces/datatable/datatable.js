@@ -1462,6 +1462,16 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
                 if($this.cfg.clientCache) {
                     $this.clearCacheMap();
                 }
+
+                // AASYS reset live scroll after sort
+                if($this.cfg.liveScroll) {
+                    $this.scrollOffset = 0;
+                    $this.liveScrollActive = false;
+                    $this.shouldLiveScroll = true;
+                    $this.loadingLiveScroll = false;
+                    $this.allLoadedLiveScroll = $this.cfg.scrollStep >= $this.cfg.scrollLimit;
+                }
+                // AASYS
             }
         };
         

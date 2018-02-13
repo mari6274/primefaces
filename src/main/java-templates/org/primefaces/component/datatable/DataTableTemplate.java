@@ -562,7 +562,13 @@ import org.primefaces.component.datatable.TableState;
     
     public void loadLazyScrollData(int offset, int rows) {
         DataModel model = getDataModel();
-        
+
+        // AASYS reset live scroll offset after sort
+        if (isLiveScroll()) {
+            setScrollOffset(offset);
+        }
+        // AASYS
+
         if(model != null && model instanceof LazyDataModel) {            
             LazyDataModel lazyModel = (LazyDataModel) model;
             
