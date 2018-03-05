@@ -131,11 +131,12 @@
 	{
 		return this.keypress(function(e)
 		{
-			var keyNo = e.which;
-			if (keyNo == 17 || keyNo == 18) //keyCode.CONTROL and keyCode.ALT
+			// AASYS - Revert fix #1852 - it disables Ctrl + X/C/V shortcuts in Firefox.
+			if (e.ctrlKey || e.altKey)
 			{
 				return;
 			}
+			// AASYS
 			var k = getKey(e);
 			if($.browser.mozilla && (isNavKeyPress(e) || k == Keys.BACKSPACE || (k == Keys.DELETE && e.charCode == 0)))
 			{
