@@ -466,12 +466,4 @@
             <required>false</required>
             <type>java.lang.String</type>
         </attribute>
-        <attribute>
-            <description>
-                <![CDATA[The suffix mapping for a array with all enum values. Default value: ALL_VALUES.]]>
-            </description>
-            <name>allSuffix</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
     </tag>
