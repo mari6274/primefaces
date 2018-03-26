@@ -481,7 +481,7 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
         this.bindRowHover(this.rowSelector);
 
-        var singleClick = false, DELAY = 300, timer = null;
+        var clickNumber = 0, DELAY = 300, timer = null, lastClickedRow = undefined;
 
         this.tbody.off('click.dataTable mousedown.dataTable', this.rowSelector)
             .on('mousedown.dataTable', this.rowSelector, null, function(e) {
@@ -495,18 +495,23 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
                 }
 
                 var $that = this;
+                clickNumber++;
 
-                singleClick = !singleClick;
+                if(clickNumber === 0 || lastClickedRow !== this){
+                    if(lastClickedRow !== this){
+                        clearTimeout(timer);
+                    }
+                    lastClickedRow = this;
 
-                if(singleClick){
                     $this.onRowClick(e, $that);
                     $this.mousedownOnRow = false;
 
                     timer = setTimeout(function(){
-                        singleClick = false;
+                        clickNumber = 0;
 
                         var selectCallback = window[datatableWidgetPrefix + "DTRowSelect"];
                         if(selectCallback != undefined){
+                            lastClickedRow = undefined;
                             selectCallback();
                         }
                     }, DELAY)
@@ -520,6 +525,7 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
                     var doubleClickCallback = window[datatableWidgetPrefix + "DTRowDoubleClick"];
                     if(doubleClickCallback != undefined){
+                        lastClickedRow = undefined;
                         doubleClickCallback();
                     }
                 }

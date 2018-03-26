@@ -400,14 +400,14 @@
                     var jq = $(PrimeFaces.escapeClientId(id));
 
                     if(jq.is(selector)) {
-                        jq.focus();
+                        customFocus(jq);
                     }
                     else {
-                        jq.find(selector).eq(0).focus();
+                        customFocus(jq.find(selector).eq(0));
                     }
                 }
                 else if(context) {
-                    $(PrimeFaces.escapeClientId(context)).find(selector).eq(0).focus();
+                    customFocus($(PrimeFaces.escapeClientId(context)).find(selector).eq(0));
                 }
                 else {
                     var elements = $(selector),
@@ -415,12 +415,12 @@
                     if(firstElement.is(':radio')) {
                         var checkedRadio = $(':radio[name="' + firstElement.attr('name') + '"]').filter(':checked');
                         if(checkedRadio.length)
-                            checkedRadio.focus();
+                            customFocus(checkedRadio);
                         else
-                            firstElement.focus();
+                            customFocus(firstElement);
                     }
                     else {
-                        firstElement.focus();
+                        customFocus(firstElement);
                     }
                 }
             }, 50);
@@ -428,6 +428,14 @@
             // remember that a custom focus has been rendered
             // this avoids to retain the last focus after ajax update
             PrimeFaces.customFocus = true;
+
+            var customFocus = function(elementToFocus){
+                var focusOnOpenDialog = elementToFocus.attr("focus_on_open_dialog");
+
+                if(typeof focusOnOpenDialog === typeof undefined || focusOnOpenDialog !== "false") {
+                    elementToFocus.focus();
+                }
+            };
         },
 
         monitorDownload: function(start, complete, monitorKey) {
