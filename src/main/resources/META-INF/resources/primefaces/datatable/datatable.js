@@ -1217,7 +1217,7 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
 
                         //AASYS 'click' again into: 'check all' checkbox when new data are loaded
-                        if(this.checkAllToggler.hasClass('ui-state-active')) {
+                        if(this.checkAllToggler != undefined && this.checkAllToggler.hasClass('ui-state-active')) {
                             this.checkAllToggler.removeClass('ui-state-active').children('span.ui-chkbox-icon').addClass('ui-icon-blank').removeClass('ui-icon-check');
                             this.toggleCheckAll();
                         }
