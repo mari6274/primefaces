@@ -32,6 +32,9 @@ import org.primefaces.util.ComponentUtils;
 public class DraggableColumnsFeature implements DataTableFeature {
 
     public void decode(FacesContext context, DataTable table) {
+        //AASYS fix for disappearing columns - when DT is refreshing
+        table.setRowIndex(-1);
+        //AASYS
         Map<String,String> params = context.getExternalContext().getRequestParameterMap();
         String columnOrderParam = params.get(table.getClientId(context) + "_columnOrder");
         if(ComponentUtils.isValueBlank(columnOrderParam)) {
