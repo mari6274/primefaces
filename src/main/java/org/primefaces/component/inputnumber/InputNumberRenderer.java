@@ -36,14 +36,26 @@ import org.primefaces.util.WidgetBuilder;
 
 public class InputNumberRenderer extends InputRenderer {
 
+    private static final String ZERO_VALUE_ATTR = "zeroValueIfEmpty";
+    private static final String ZERO = "0";
+
     @Override
     public Object getConvertedValue(FacesContext context, UIComponent component, Object submittedValue)
             throws ConverterException {
 
-        String submittedValueString = (String) submittedValue;
+        Object zeroValueAttribute = component.getAttributes().get(ZERO_VALUE_ATTR);
+        Boolean zeroValueIfEmpty = false;
+        if (zeroValueAttribute != null) {
+            zeroValueIfEmpty = Boolean.parseBoolean(zeroValueAttribute.toString());
+        }
 
+        String submittedValueString = (String) submittedValue;
         if (ComponentUtils.isValueBlank(submittedValueString)) {
-            return null;
+            if (zeroValueIfEmpty) {
+                submittedValueString = ZERO;
+            } else {
+                return null;
+            }
         }
 
         Converter converter = ComponentUtils.getConverter(context, component);
