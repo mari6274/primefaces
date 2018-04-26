@@ -124,7 +124,7 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
     showSuggestions: function() {
         //AASYS hide suggestion when input is not focus
         if(!this.input.is(':focus'))
-            return
+            return;
         //AASYS
 
         this.items = this.itemContainer.children('.ui-autocomplete-item');
