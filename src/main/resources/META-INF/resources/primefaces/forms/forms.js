@@ -965,6 +965,12 @@ PrimeFaces.widget.SelectOneMenu = PrimeFaces.widget.DeferredWidget.extend({
                 default:
                 break;
             }
+        }).on('paste.ui-selectonemenu', function() {
+            //AASYS: Selectonemenu copy/paste filter doesn't work #2598
+            //copied from PF 6.2
+            setTimeout(function(){
+                $this.filter($this.filterInput.val());
+            },2);
         });
     },
 
