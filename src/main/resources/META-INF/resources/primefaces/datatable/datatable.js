@@ -3030,7 +3030,11 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
         var $this = this;
 
-        $(this.jqId + ' thead th').draggable({
+        $(this.jqId + ' thead th')
+            // AASYS - skip columns with class: not-draggable
+            .not('.not-draggable')
+            // AASYS
+            .draggable({
             appendTo: 'body',
             opacity: 0.75,
             cursor: 'move',
