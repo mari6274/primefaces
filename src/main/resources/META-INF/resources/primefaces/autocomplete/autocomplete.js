@@ -380,7 +380,8 @@ PrimeFaces.widget.AutoComplete = PrimeFaces.widget.BaseWidget.extend({
                         // AASYS permit bakcspace in single mode with chips
                         var attribute = this.attributes['swc'];
                         var singleModeWithChip = attribute != null && attribute.value == 'T';
-                        if (($this.cfg.multiple && !$this.input.val().length) || singleModeWithChip) {
+                        if (($this.cfg.multiple && !$this.input.val().length) || singleModeWithChip
+                            && $this.input.val().length >= $this.cfg.minLength) {
                             // AASYS
                             $this.removeItem(e, $(this).parent().prev());
 
