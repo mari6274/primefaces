@@ -947,10 +947,14 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
         }
         
         this.cloneHead();
-              
+
+        // AASYS - move by 1 px to allow scrolling up
+        this.scrollStateHolder.val("0,1");
+        // AASYS
         this.restoreScrollState();
 
         if(this.cfg.liveScroll) {
+            this.previousRows = this.scrollOffset > 0 ? this.scrollOffset : (this.previousRows || 0);
             this.scrollOffset = 0;
             this.cfg.liveScrollBuffer = (100 - this.cfg.liveScrollBuffer) / 100;
             this.shouldLiveScroll = true;       
@@ -996,6 +1000,10 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
 
                 if((scrollTop >= ((scrollHeight * $this.cfg.liveScrollBuffer) - (viewportHeight))) && $this.shouldLoadLiveScroll()) {
                     $this.loadLiveRows();
+                } else if (scrollTop === 0) {
+                    // AASYS - load previous rows if scrolled up
+                    $this.loadPreviousLiveRows();
+                    // AASYS
                 }
             }
             
@@ -1236,6 +1244,61 @@ PrimeFaces.widget.DataTable = PrimeFaces.widget.DeferredWidget.extend({
                 $this.allLoadedLiveScroll = ($this.scrollOffset + $this.cfg.scrollStep) >= $this.cfg.scrollLimit;
             }
         };
+
+        PrimeFaces.ajax.Request.handle(options);
+    },
+
+    loadPreviousLiveRows: function () {
+        if (this.liveScrollActive || (this.previousRows === 0)) {
+            return;
+        }
+
+        this.liveScrollActive = true;
+        this.previousRows -= this.cfg.scrollStep;
+
+        var $this = this,
+            options = {
+                source: this.id,
+                process: this.id,
+                update: this.id,
+                formId: this.cfg.formId,
+                params: [{name: this.id + '_scrolling', value: true},
+                    {name: this.id + '_skipChildren', value: true},
+                    {name: this.id + '_scrollOffset', value: 0},
+                    {name: 'scrollUp', value: true},
+                    {name: this.id + '_encodeFeature', value: true}],
+                onsuccess: function (responseXML, status, xhr) {
+                    PrimeFaces.ajax.Response.handle(responseXML, status, xhr, {
+                        widget: $this,
+                        handle: function (content) {
+                            //insert new rows
+                            var height = this.tbody.height();
+                            this.tbody.prepend(content);
+                            this.scrollBody.scrollTop(this.tbody.height() - height);
+                            this.postUpdateData();
+
+                            this.liveScrollActive = false;
+
+
+                            //AASYS 'click' again into: 'check all' checkbox when new data are loaded
+                            if (this.checkAllToggler != undefined && this.checkAllToggler.hasClass('ui-state-active')) {
+                                this.checkAllToggler.removeClass('ui-state-active').children('span.ui-chkbox-icon').addClass('ui-icon-blank').removeClass('ui-icon-check');
+                                this.toggleCheckAll();
+                            }
+                            //AASYS
+                        }
+                    });
+
+                    return true;
+                },
+                oncomplete: function (xhr, status, args) {
+                    if (typeof args.totalRecords !== 'undefined') {
+                        $this.previousRows = args.totalRecords;
+                    }
+
+                    $this.loadingLiveScroll = false;
+                }
+            };
 
         PrimeFaces.ajax.Request.handle(options);
     },
@@ -3625,8 +3688,8 @@ PrimeFaces.widget.FrozenDataTable = PrimeFaces.widget.DataTable.extend({
             }
         }
         
-        this.cloneHead();  
-        
+        this.cloneHead();
+
         this.restoreScrollState();
         
         if(this.cfg.liveScroll) {
