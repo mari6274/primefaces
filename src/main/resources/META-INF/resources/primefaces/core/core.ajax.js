@@ -38,7 +38,7 @@ if (!PrimeFaces.ajax) {
         if (cfg.source !== undefined) {
             source = cfg.source;
         }
-        if (document.getElementById(source) === null) {
+        if (source.includes("remote") && document.getElementById(source) === null) {
             return;
         }
         for (var option in cfg) {
