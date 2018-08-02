@@ -1007,8 +1007,10 @@ PrimeFaces.widget.TreeTable = PrimeFaces.widget.DeferredWidget.extend({
         if(!this.cfg.liveResize) {
             this.resizerHelper = $('<div class="ui-column-resizer-helper ui-state-highlight"></div>').appendTo(this.jq);
         }
-        
-        this.thead.find('> tr > th.ui-resizable-column:not(:last-child)').prepend('<span class="ui-column-resizer">&nbsp;</span>');        
+
+        // AASYS add resizer to last column
+        this.thead.find('> tr > th.ui-resizable-column').prepend('<span class="ui-column-resizer">&nbsp;</span>');
+        // AASYS
         var resizers = this.thead.find('> tr > th > span.ui-column-resizer'),
         $this = this;
             
@@ -1074,42 +1076,73 @@ PrimeFaces.widget.TreeTable = PrimeFaces.widget.DeferredWidget.extend({
             containment: this.jq
         });
     },
-    
-    resize: function(event, ui) {
+
+    // AASYS add support for expand resize mode
+    resize: function (event, ui) {
         var columnHeader = ui.helper.parent(),
-        nextColumnHeader = columnHeader.next(),
-        change = null, newWidth = null, nextColumnWidth = null;
-        
-        if(this.cfg.liveResize) {
+            nextColumnHeader = columnHeader.next(),
+            change = null, newWidth = null, nextColumnWidth = null,
+            expandMode = (this.cfg.resizeMode === 'expand'),
+            table = this.thead.parent();
+
+        if (this.cfg.liveResize) {
             change = columnHeader.outerWidth() - (event.pageX - columnHeader.offset().left),
-            newWidth = (columnHeader.width() - change),
-            nextColumnWidth = (nextColumnHeader.width() + change);
-        } 
+                newWidth = (columnHeader.width() - change),
+                nextColumnWidth = (nextColumnHeader.width() + change);
+        }
         else {
             change = (ui.position.left - ui.originalPosition.left),
-            newWidth = (columnHeader.width() + change),
-            nextColumnWidth = (nextColumnHeader.width() - change);
+                newWidth = (columnHeader.width() + change),
+                nextColumnWidth = (nextColumnHeader.width() - change);
         }
-        
-        if(newWidth > 15 && nextColumnWidth > 15) {
-            columnHeader.width(newWidth);
-            nextColumnHeader.width(nextColumnWidth);
-            var colIndex = columnHeader.index();
 
-            if(this.cfg.scrollable) {
-                this.theadClone.find(PrimeFaces.escapeClientId(columnHeader.attr('id') + '_clone')).width(newWidth);
-                this.theadClone.find(PrimeFaces.escapeClientId(nextColumnHeader.attr('id') + '_clone')).width(nextColumnWidth);
+        var tableWidthChange = change > 0 ? -change : change;
+        if (newWidth > 15 && nextColumnWidth > 15 || (expandMode && newWidth > 15)) {
+            if (expandMode) {
+                table.width(table.width() + tableWidthChange);
+                setTimeout(function () {
+                    columnHeader.width(newWidth);
+                }, 1);
+            }
+            else {
+                columnHeader.width(newWidth);
+                nextColumnHeader.width(nextColumnWidth);
+            }
 
-                if(this.footerCols.length > 0) {
-                    var footerCol = this.footerCols.eq(colIndex),
-                    nextFooterCol = footerCol.next();
+            if (this.cfg.scrollable) {
+                var cloneTable = this.theadClone.parent(),
+                    colIndex = columnHeader.index();
 
-                    footerCol.width(newWidth);
-                    nextFooterCol.width(nextColumnWidth);
+                if (expandMode) {
+                    var $this = this;
+
+                    //body
+                    cloneTable.width(cloneTable.width() + tableWidthChange);
+
+                    //footer
+                    this.footerTable.width(this.footerTable.width() + change);
+
+                    setTimeout(function () {
+                        $this.theadClone.find(PrimeFaces.escapeClientId(columnHeader.attr('id') + '_clone')).width(newWidth);   //body
+                        $this.footerCols.eq(colIndex).width(newWidth);                                                          //footer
+                    }, 1);
+                }
+                else {
+                    this.theadClone.find(PrimeFaces.escapeClientId(columnHeader.attr('id') + '_clone')).width(newWidth);
+                    this.theadClone.find(PrimeFaces.escapeClientId(nextColumnHeader.attr('id') + '_clone')).width(nextColumnWidth);
+
+                    if (this.footerCols.length > 0) {
+                        var footerCol = this.footerCols.eq(colIndex),
+                            nextFooterCol = footerCol.next();
+
+                        footerCol.width(newWidth);
+                        nextFooterCol.width(nextColumnWidth);
+                    }
                 }
             }
         }
     },
+    // AASYS
     
     reclone: function() {
         this.clone.remove();
