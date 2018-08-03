@@ -589,17 +589,9 @@ public class DataTableRenderer extends DataRenderer {
             else
                 columnClass += " ui-state-active";
         }
-        
-        String style = column.getStyle();
-        String width = column.getWidth();
-        if(width != null) {
-            String unit = width.endsWith("%") ? "" : "px";
-            if(style != null)
-                style = style + ";width:" + width + unit;
-            else
-                style = "width:" + width + unit;
-        }
-        
+
+        String style = buildColumnStyle(column);
+
         String ariaHeaderLabel = getHeaderLabel(context, column);
         
         writer.startElement("th", null);
@@ -639,7 +631,20 @@ public class DataTableRenderer extends DataRenderer {
         
         writer.endElement("th");
     }
-    
+
+    public static String buildColumnStyle(UIColumn column) {
+        String style = column.getStyle();
+        String width = column.getWidth();
+        if(width != null) {
+            String unit = width.endsWith("%") ? "" : "px";
+            if(style != null)
+                style = style + ";width:" + width + unit;
+            else
+                style = "width:" + width + unit;
+        }
+        return style;
+    }
+
     protected Object findFilterValue(DataTable table, UIColumn column) {
         List<FilterState> filters = table.getFilterBy();
         if(filters != null) {

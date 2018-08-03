@@ -35,6 +35,7 @@ import org.primefaces.component.celleditor.CellEditor;
 import org.primefaces.component.column.Column;
 import org.primefaces.component.columngroup.ColumnGroup;
 import org.primefaces.component.columns.Columns;
+import org.primefaces.component.datatable.DataTableRenderer;
 import org.primefaces.component.row.Row;
 import org.primefaces.component.tree.Tree;
 import org.primefaces.context.RequestContext;
@@ -185,6 +186,7 @@ public class TreeTableRenderer extends DataRenderer {
             .attr("selectionMode", selectionMode, null)
             .attr("resizableColumns", tt.isResizableColumns(), false)
             .attr("liveResize", tt.isLiveResize(), false)
+                .attr("resizeMode", tt.getResizeMode(), "fit")
             .attr("scrollable", tt.isScrollable(), false)
             .attr("scrollHeight", tt.getScrollHeight(), null)
             .attr("scrollWidth", tt.getScrollWidth(), null)
@@ -575,7 +577,7 @@ public class TreeTableRenderer extends DataRenderer {
         ValueExpression columnSortByVE = column.getValueExpression("sortBy");
         boolean sortable = (columnSortByVE != null);
         String sortIcon = null;
-        String style = column.getStyle();
+        String style = DataTableRenderer.buildColumnStyle(column);
         String columnClass = sortable ? TreeTable.SORTABLE_COLUMN_HEADER_CLASS : TreeTable.COLUMN_HEADER_CLASS;
         String userColumnClass = column.getStyleClass();
         if(column.isResizable()) columnClass = columnClass + " " + TreeTable.RESIZABLE_COLUMN_CLASS;

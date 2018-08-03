@@ -31,6 +31,16 @@ if (!PrimeFaces.ajax) {
      * Ajax shortcut
      */
     PrimeFaces.ab = function(cfg, ext) {
+        var source;
+        if (cfg.s !== undefined) {
+            source = cfg.s;
+        }
+        if (cfg.source !== undefined) {
+            source = cfg.source;
+        }
+        if (source.includes("remote") && document.getElementById(source) === null) {
+            return;
+        }
         for (var option in cfg) {
             if (!cfg.hasOwnProperty(option)) {
                 continue;

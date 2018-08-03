@@ -128,6 +128,13 @@
             <defaultValue>false</defaultValue>
             <description>Columns are resized live in this mode without using a resize helper.</description>
 		</attribute>
+		<attribute>
+			<name>resizeMode</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+			<defaultValue>fit</defaultValue>
+			<description>Defines the resize behavior, valid values are "fit" (default) and expand.</description>
+		</attribute>
         <attribute>
 			<name>required</name>
 			<required>false</required>

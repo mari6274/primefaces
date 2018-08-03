@@ -15,9 +15,11 @@
  */
 package org.primefaces.component.selectcheckboxmenu;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.List;
+import org.primefaces.expression.SearchExpressionFacade;
+import org.primefaces.renderkit.SelectManyRenderer;
+import org.primefaces.util.ComponentUtils;
+import org.primefaces.util.WidgetBuilder;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.UINamingContainer;
 import javax.faces.component.UISelectMany;
@@ -26,11 +28,11 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.model.SelectItem;
+import javax.faces.model.SelectItemGroup;
 import javax.faces.render.Renderer;
-import org.primefaces.expression.SearchExpressionFacade;
-import org.primefaces.renderkit.SelectManyRenderer;
-import org.primefaces.util.ComponentUtils;
-import org.primefaces.util.WidgetBuilder;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.List;
 
 public class SelectCheckboxMenuRenderer extends SelectManyRenderer {
     
@@ -97,15 +99,28 @@ public class SelectCheckboxMenuRenderer extends SelectManyRenderer {
 
         int idx = -1;
         for(SelectItem selectItem : selectItems) {
-            idx++;
-
-            encodeOption(context, menu, values, submittedValues, converter, selectItem, idx);
+            if(selectItem instanceof SelectItemGroup){
+                SelectItemGroup selectItemGroup = (SelectItemGroup) selectItem;
+                String selectItemGroupLabel = selectItemGroup.getLabel() == null ? "" : selectItemGroup.getLabel();
+                for (SelectItem childSelectItem : selectItemGroup.getSelectItems()){
+                    idx++;
+                    encodeOption(context, menu, values, submittedValues, converter, childSelectItem, idx, selectItemGroupLabel);
+                }
+            }
+            else{
+                idx++;
+                encodeOption(context, menu, values, submittedValues, converter, selectItem, idx);
+            }
         }
         
         writer.endElement("div");
     }
+
+    protected void encodeOption(FacesContext context, SelectCheckboxMenu menu, Object values, Object submittedValues, Converter converter, SelectItem option, int idx) throws IOException{
+        encodeOption(context, menu, values, submittedValues, converter, option, idx, null);
+    }
     
-    protected void encodeOption(FacesContext context, SelectCheckboxMenu menu, Object values, Object submittedValues, Converter converter, SelectItem option, int idx) throws IOException {
+    protected void encodeOption(FacesContext context, SelectCheckboxMenu menu, Object values, Object submittedValues, Converter converter, SelectItem option, int idx,String selectItemGroupLabel) throws IOException {
         ResponseWriter writer = context.getResponseWriter();
         String itemValueAsString = getOptionAsString(context, menu, converter, option.getValue());
         String name = menu.getClientId(context);
@@ -137,6 +152,9 @@ public class SelectCheckboxMenuRenderer extends SelectManyRenderer {
         writer.writeAttribute("type", "checkbox", null);
         writer.writeAttribute("value", itemValueAsString, null);
         writer.writeAttribute("data-escaped", String.valueOf(escaped), null);
+        if(selectItemGroupLabel != null){
+            writer.writeAttribute("group-label", selectItemGroupLabel, null);
+        }
 
         if(checked) writer.writeAttribute("checked", "checked", null);
         if(disabled) writer.writeAttribute("disabled", "disabled", null);
